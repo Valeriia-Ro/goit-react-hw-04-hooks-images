@@ -1,22 +1,18 @@
 import React from "react";
-import { useState } from "react";
 import styles from "../Searchbar/Searchbar.module.css";
 import s from "../Searchbar/SearchForm.module.css";
 // import PropTypes from 'prop-types';
 
-export default function Searchbar({ onSearch }) {
-  const [searchImage, setSearchImage] = useState("");
-
-  const handleNameChange = (e) => {
-    setSearchImage({ searchImage: e.currentTarget.value.toLowerCase() });
-  };
-
+const Searchbar = ({ onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (searchImage.trim() === "") {
+    const data = e.target.searchForm.value;
+    console.log(data);
+    if (data.trim() === "") {
       alert("Заполните поисковую строку");
       return;
     }
+    onSubmit(data);
   };
 
   return (
@@ -27,15 +23,15 @@ export default function Searchbar({ onSearch }) {
         </button>
 
         <input
+          name="searchForm"
           className={s.SearchForm_input}
           type="text"
           autocomplete="off"
           autofocus
           placeholder="Search images and photos"
-          value={searchImage}
-          onChange={handleNameChange}
         />
       </form>
     </header>
   );
-}
+};
+export default Searchbar;

@@ -10,7 +10,7 @@ import "./index.css";
 
 export default function App() {
   const [showModal, setShowModal] = useState(false);
-  const [searchImage] = useState(false);
+  const [searchImage, setSearchImage] = useState(false);
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalImg, setModalImg] = useState("");
@@ -18,24 +18,27 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
 
-  useEffect((prevState) => {
-    if (prevState.searchImage !== searchImage) {
-      fetchGallery();
+  useEffect(() => {
+    if (searchImage === "" && currentPage === 1) {
+      return;
     }
-  });
-
-  const fetchGallery = () => {
-    const options = { searchImage, currentPage };
-    setLoading({ loading: true });
-
-    api(options)
-      .then((images) => {
-        setImages((prevState) => [...prevState, ...images]);
-        setCurrentPage((prevState) => [prevState + 1]);
+    api(searchImage, currentPage)
+      .then((newImage) => {
+        if (currentPage === 1) {
+          setSearchImage(newImage);
+        } else {
+          setSearchImage((prevState) => [...prevState, ...newImage]);
+        }
         windowScroll();
       })
-      .catch((error) => setError({ error }))
-      .finally(() => setLoading({ loading: false }));
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
+  }, [searchImage, currentPage]);
+
+  const handleInput = (searchData) => {
+    setSearchImage(searchData);
+    setImages([]);
+    setCurrentPage(1);
   };
 
   const windowScroll = () => {
@@ -60,16 +63,16 @@ export default function App() {
   };
 
   const loadMoreButton = images.length > 0 && !loading;
-
+  const onLoadMoreButton = () => setCurrentPage((prevState) => prevState + 1);
   return (
     <Container>
-      <Searchbar />
+      <Searchbar onSubmit={handleInput} />
 
       {error && <h1> Something went wrong</h1>}
       <ImageGallery images={images} openModal={openModal} />
       {loading && <LoaderSpiner />}
 
-      {loadMoreButton && <Button onClick={fetchGallery} />}
+      {loadMoreButton && <Button onClick={onLoadMoreButton} />}
 
       {showModal && (
         <Modal onClose={toggleModal}>
