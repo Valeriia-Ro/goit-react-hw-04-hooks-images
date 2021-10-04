@@ -18,27 +18,39 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
 
+  const onLoadMoreButton = () => {
+    loadMoreButton();
+    setCurrentPage(currentPage + 1);
+  };
+
+  const loadMoreButton = () => {
+    setLoading((prevLoading) => !prevLoading);
+  };
+
   useEffect(() => {
-    if (searchImage === "" && currentPage === 1) {
+    if (!searchImage) {
       return;
     }
-    api(searchImage, currentPage)
-      .then((newImage) => {
-        if (currentPage === 1) {
-          setSearchImage(newImage);
-        } else {
-          setSearchImage((prevState) => [...prevState, ...newImage]);
-        }
-        windowScroll();
-      })
-      .catch((error) => setError(error))
-      .finally(() => setLoading(false));
-  }, [searchImage, currentPage]);
+    const images = api(searchImage);
+    onLoadMoreButton();
+    setImages(images);
+  }, [onLoadMoreButton, searchImage]);
 
-  const handleInput = (searchData) => {
-    setSearchImage(searchData);
-    setImages([]);
-    setCurrentPage(1);
+  useEffect(() => {
+    windowScroll();
+    if (searchImage) {
+      try {
+        api(searchImage, currentPage).then((images) => {
+          setImages((prevState) => [...prevState, ...images]);
+          onLoadMoreButton();
+        });
+      } catch (error) {}
+    }
+  }, [currentPage, onLoadMoreButton, searchImage]);
+
+  const handleFormSubmit = (searchImage) => {
+    onLoadMoreButton();
+    setSearchImage(searchImage);
   };
 
   const windowScroll = () => {
@@ -62,11 +74,9 @@ export default function App() {
     }));
   };
 
-  const loadMoreButton = images.length > 0 && !loading;
-  const onLoadMoreButton = () => setCurrentPage((prevState) => prevState + 1);
   return (
     <Container>
-      <Searchbar onSubmit={handleInput} />
+      <Searchbar onSubmit={handleFormSubmit} />
 
       {error && <h1> Something went wrong</h1>}
       <ImageGallery images={images} openModal={openModal} />
