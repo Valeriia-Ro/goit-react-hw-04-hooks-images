@@ -10,6 +10,7 @@ export default function Searchbar({ onSubmit }) {
   const onChangeForm = (e) => {
     const value = e.currentTarget.value.trim();
     setForm(value);
+    console.log(value);
   };
 
   const handleSubmit = (e) => {
@@ -19,6 +20,8 @@ export default function Searchbar({ onSubmit }) {
       return;
     }
     onSubmit(form);
+
+    console.log(form);
   };
 
   return (

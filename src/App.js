@@ -44,13 +44,26 @@ export default function App() {
           setImages((prevState) => [...prevState, ...images]);
           onLoadMoreButton();
         });
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+        alert(error);
+      }
     }
-  }, [currentPage, onLoadMoreButton, searchImage]);
+    console.log(
+      api(searchImage, currentPage).then((images) => {
+        setImages((prevState) => [...prevState, ...images]);
+      })
+    );
+    console.log(images);
+    console.log(searchImage);
+    console.log(currentPage);
+  }, [currentPage, searchImage]);
 
   const handleFormSubmit = (searchImage) => {
     onLoadMoreButton();
     setSearchImage(searchImage);
+    console.log(searchImage);
+    console.log(images);
   };
 
   const windowScroll = () => {

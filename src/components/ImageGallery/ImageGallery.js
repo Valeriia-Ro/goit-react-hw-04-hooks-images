@@ -14,7 +14,7 @@ const ImageGallery = ({ images, openModal }) => {
               openModal(largeImageURL, tags);
             }}
           >
-            <ImageGalleryItem url={webformatURL} alt={tags} />
+            <ImageGalleryItem images={images} url={webformatURL} alt={tags} />
           </li>
         );
       })}
