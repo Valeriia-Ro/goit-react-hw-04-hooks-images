@@ -34,13 +34,14 @@ export default function App() {
     const images = api(searchImage);
     onLoadMoreButton();
     setImages(images);
-  }, [onLoadMoreButton, searchImage]);
+    console.log(images);
+  }, [searchImage]);
 
   useEffect(() => {
     windowScroll();
     if (searchImage) {
       try {
-        api(searchImage, currentPage).then((images) => {
+        api({ searchImage, currentPage }).then((images) => {
           setImages((prevState) => [...prevState, ...images]);
           onLoadMoreButton();
         });
@@ -50,7 +51,7 @@ export default function App() {
       }
     }
     console.log(
-      api(searchImage, currentPage).then((images) => {
+      api({ searchImage, currentPage }).then((images) => {
         setImages((prevState) => [...prevState, ...images]);
       })
     );
