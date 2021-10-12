@@ -10,7 +10,7 @@ import "./index.css";
 
 export default function App() {
   const [showModal, setShowModal] = useState(false);
-  const [searchImage, setSearchImage] = useState(false);
+  const [searchImage, setSearchImage] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalImg, setModalImg] = useState("");
@@ -19,52 +19,36 @@ export default function App() {
   const [error, setError] = useState(null);
 
   const onLoadMoreButton = () => {
-    loadMoreButton();
     setCurrentPage(currentPage + 1);
   };
 
-  const loadMoreButton = () => {
-    setLoading((prevLoading) => !prevLoading);
-  };
-
   useEffect(() => {
-    if (!searchImage) {
+    if (searchImage === "" && currentPage === 1) {
       return;
     }
-    const images = api(searchImage);
-    onLoadMoreButton();
-    setImages(images);
-    console.log(images);
-  }, [searchImage]);
-
-  useEffect(() => {
-    windowScroll();
-    if (searchImage) {
-      try {
-        api({ searchImage, currentPage }).then((images) => {
-          setImages((prevState) => [...prevState, ...images]);
+    api({ searchImage, currentPage })
+      .then((newImages) => {
+        if (currentPage === 1) {
+          setImages(newImages);
+        } else {
+          setImages((prevState) => [...prevState, ...newImages]);
           onLoadMoreButton();
-        });
-      } catch (error) {
+        }
+        windowScroll();
+      })
+      .catch((error) => {
         console.log(error);
         alert(error);
-      }
-    }
-    console.log(
-      api({ searchImage, currentPage }).then((images) => {
-        setImages((prevState) => [...prevState, ...images]);
-      })
-    );
+      });
     console.log(images);
     console.log(searchImage);
     console.log(currentPage);
-  }, [currentPage, searchImage]);
+  }, [searchImage, currentPage]);
 
-  const handleFormSubmit = (searchImage) => {
-    onLoadMoreButton();
-    setSearchImage(searchImage);
-    console.log(searchImage);
-    console.log(images);
+  const handleFormSubmit = (searchData) => {
+    setSearchImage(searchData);
+    setImages([]);
+    setCurrentPage(1);
   };
 
   const windowScroll = () => {
@@ -74,6 +58,13 @@ export default function App() {
     });
   };
 
+  // const toggleModal = () => setShowModal(!showModal);
+
+  // const openModal = (url, alt) => {
+  //   setModalImg(url);
+  //   setModalAlt(alt);
+  // };
+
   const toggleModal = () => {
     setShowModal(({ showModal }) => ({
       showModal: !showModal,
@@ -82,10 +73,14 @@ export default function App() {
 
   const openModal = (url, alt) => {
     setShowModal(({ showModal }) => ({
-      showModal: !showModal,
+      showModal: showModal,
       modalImg: url,
       modalAlt: alt,
     }));
+  };
+
+  const loadMoreButton = () => {
+    setLoading(!loading);
   };
 
   return (
@@ -100,7 +95,7 @@ export default function App() {
 
       {showModal && (
         <Modal onClose={toggleModal}>
-          <img src={modalImg} alt={modalAlt} />
+          <img url={modalImg} alt={modalAlt} />
         </Modal>
       )}
     </Container>

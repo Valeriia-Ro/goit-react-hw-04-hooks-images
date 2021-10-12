@@ -2,31 +2,26 @@ import React from "react";
 import { useEffect } from "react";
 import styles from "../Modal/Modal.module.css";
 
-export default function Modal({ onClose }) {
+export default function Modal({ picture, alt, onClose }) {
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleBackdropClick);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleBackdropClick);
     };
   });
 
-  const handleKeyDown = (e) => {
-    if (e.code === "Escape") {
-      console.log("close modal");
-      onClose();
-    }
-  };
-
   const handleBackdropClick = (e) => {
-    console.log("bkdr ckick");
-    if (e.currentTarget === e.target) {
+    console.log("close ckick");
+    if (e.currentTarget === e.target || e.code === "Escape") {
       onClose();
     }
   };
 
   return (
     <div className={styles.Overlay} onClick={handleBackdropClick}>
-      <div className={styles.Modal}>{""}</div>
+      <div className={styles.Modal}>
+        <img src={picture} alt={alt} />
+      </div>
     </div>
   );
 }
