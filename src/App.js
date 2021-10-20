@@ -32,7 +32,6 @@ export default function App() {
           setImages(newImages);
         } else {
           setImages((prevState) => [...prevState, ...newImages]);
-          onLoadMoreButton();
         }
         windowScroll();
       })
@@ -40,9 +39,6 @@ export default function App() {
         console.log(error);
         alert(error);
       });
-    console.log(images);
-    console.log(searchImage);
-    console.log(currentPage);
   }, [searchImage, currentPage]);
 
   const handleFormSubmit = (searchData) => {
@@ -58,25 +54,17 @@ export default function App() {
     });
   };
 
-  // const toggleModal = () => setShowModal(!showModal);
-
-  // const openModal = (url, alt) => {
-  //   setModalImg(url);
-  //   setModalAlt(alt);
-  // };
-
-  const toggleModal = () => {
-    setShowModal(({ showModal }) => ({
-      showModal: !showModal,
-    }));
-  };
-
-  const openModal = (url, alt) => {
-    setShowModal(({ showModal }) => ({
-      showModal: showModal,
-      modalImg: url,
-      modalAlt: alt,
-    }));
+  const toggleModal = (img) => {
+    if (img) {
+      const imgModal = { picture: img };
+      const altModal = { alt: img };
+      setModalAlt(altModal);
+      setModalImg(imgModal);
+      console.log(imgModal);
+      console.log(altModal);
+    }
+    setShowModal(!showModal);
+    console.log(modalImg);
   };
 
   const loadMoreButton = () => {
@@ -88,14 +76,14 @@ export default function App() {
       <Searchbar onSubmit={handleFormSubmit} />
 
       {error && <h1> Something went wrong</h1>}
-      <ImageGallery images={images} openModal={openModal} />
+      <ImageGallery images={images} openModal={toggleModal} />
       {loading && <LoaderSpiner />}
 
       {loadMoreButton && <Button onClick={onLoadMoreButton} />}
 
       {showModal && (
         <Modal onClose={toggleModal}>
-          <img url={modalImg} alt={modalAlt} />
+          <img picture={modalImg} alt={modalAlt} />
         </Modal>
       )}
     </Container>
